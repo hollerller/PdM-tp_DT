@@ -39,6 +39,9 @@ void BME280_init(void);
 void BME280_calculate(void);
 
 
+
+
+
 /*
 void TrimRead(void);
 int BME280_Config (uint8_t osrs_t, uint8_t osrs_p, uint8_t osrs_h, uint8_t mode, uint8_t t_sb, uint8_t filter);

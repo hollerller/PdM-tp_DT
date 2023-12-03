@@ -5,12 +5,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Drivers/API/Src/API_controlFSM.c \
+../Drivers/API/Src/API_delay.c \
+../Drivers/API/Src/API_uart.c \
 ../Drivers/API/Src/BME280.c 
 
 OBJS += \
+./Drivers/API/Src/API_controlFSM.o \
+./Drivers/API/Src/API_delay.o \
+./Drivers/API/Src/API_uart.o \
 ./Drivers/API/Src/BME280.o 
 
 C_DEPS += \
+./Drivers/API/Src/API_controlFSM.d \
+./Drivers/API/Src/API_delay.d \
+./Drivers/API/Src/API_uart.d \
 ./Drivers/API/Src/BME280.d 
 
 
@@ -21,7 +30,7 @@ Drivers/API/Src/%.o Drivers/API/Src/%.su Drivers/API/Src/%.cyclo: ../Drivers/API
 clean: clean-Drivers-2f-API-2f-Src
 
 clean-Drivers-2f-API-2f-Src:
-	-$(RM) ./Drivers/API/Src/BME280.cyclo ./Drivers/API/Src/BME280.d ./Drivers/API/Src/BME280.o ./Drivers/API/Src/BME280.su
+	-$(RM) ./Drivers/API/Src/API_controlFSM.cyclo ./Drivers/API/Src/API_controlFSM.d ./Drivers/API/Src/API_controlFSM.o ./Drivers/API/Src/API_controlFSM.su ./Drivers/API/Src/API_delay.cyclo ./Drivers/API/Src/API_delay.d ./Drivers/API/Src/API_delay.o ./Drivers/API/Src/API_delay.su ./Drivers/API/Src/API_uart.cyclo ./Drivers/API/Src/API_uart.d ./Drivers/API/Src/API_uart.o ./Drivers/API/Src/API_uart.su ./Drivers/API/Src/BME280.cyclo ./Drivers/API/Src/BME280.d ./Drivers/API/Src/BME280.o ./Drivers/API/Src/BME280.su
 
 .PHONY: clean-Drivers-2f-API-2f-Src
 

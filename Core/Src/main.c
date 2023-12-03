@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "BME280.h"
+#include "API_controlFSM.h"
 
 
 /* Private includes ----------------------------------------------------------*/
@@ -120,7 +121,9 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  BME280_calculate();
-	  HAL_Delay(500);
+      controlFSM_update();
+
+
 
 	  char dataStr[255] = "";
 
@@ -131,6 +134,8 @@ int main(void)
 
       HAL_UART_Transmit(&huart2, (uint8_t *)dataStr, strlen(dataStr), 1000);
 
+
+      HAL_Delay(500);
 	//  HAL_UART_Transmit(&huart2, initialSettings, size, 1000);
 
 
