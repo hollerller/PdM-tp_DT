@@ -5,45 +5,76 @@
  *      Author: hollerller
  */
 
-
-#include <driver_BME280.h>
 #include <stdint.h>
 #include "stm32f4xx_hal.h"
 
+#include "driver_BME280.h"
+#include "API_i2c.h"
+
+#define BME280_ADDRESS 0xEC	// Device Address
+#define TIMEOUT 1000		// Timeout
+#define BME_HAL_DELAY 100	// Delay used between initialization settings
+#define MEMADDRESSSIZE	1	// Memory address Size -> Required in HAL_I2C_Mem_Read/Write Functions
+#define CALIBMEMADD1 0x88	// First memory address of the first portion of calibration data
+#define CALIBMEMADD2 0xE1	// First memory address of the second portion of calibration data
+#define CALIBDATASIZE1 25	// Size of first portion of compensation data
+#define CALIBDATASIZE2 7	// Size of second portion of compensation data
+#define CMDWRITESIZE 1		// Size of the control parameters
+#define RAWDATAREG1 0XF7	// First memory address of the first portion of raw data
+#define RAWDATASIZE 8		// Size of the raw data to be read
+
+// Initial settings registers
+
+#define RESET_REG 0xE0
+#define CTRL_HUM 0xF2
+#define STATUS 0xF3
+#define CTRL_MEAS 0xF4
+#define CONFIG_REG 0xF5
 
 
-#define BME280_ADDRESS 0xEC
-#define TIMEOUT 1000
-
-extern I2C_HandleTypeDef hi2c1;
-
-uint16_t firstMemAddres = 0x88;
-uint16_t memAddressSize = 1;
-
-
+// Variables to save the compensation values for later calculations
 
 uint16_t dig_T1, dig_P1, dig_H1, dig_H3;
-int16_t dig_T2, dig_T3, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9, dig_H2, dig_H4, dig_H5, dig_H6;
+int16_t dig_T2, dig_T3, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8,
+		dig_P9, dig_H2, dig_H4, dig_H5, dig_H6;
+
+// stores the raw data read by the sensor
 
 int32_t tADC, hADC;
 
 typedef int32_t BME280_S32_t;
 typedef uint32_t BME280_U32_t;
 
+// stores the actual values for temperature and humidity
 
 float temp, hum, pres;
 
-// Read the calibration parameters stored in the sensor NVM
+/*
+ * Reads the calibration data from the sensor
+ *
+ * This function uses I2C memory reads to get the calibration data from the sensor memory.
+ * Once the uncompensated values for temperature and humidity are read,
+ * this calibration parameters are used to calculate the actual values for T and H.
+ * 		- Refer to datasheet page 24 >> 4.2.2 Trimming parameter readout
+ *
+ */
 
-void trimmingParametersRead (void) {
+static void trimmingParametersRead(void) {
 
-uint8_t calibData1[26];
-uint8_t calibData2[7];
+	// Store calibration data from sensor memory
 
-	HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0x88, 1, calibData1, 25, TIMEOUT);
+	uint8_t calibData1[26];
+	uint8_t calibData2[7];
 
-	HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0xE1, 1, calibData2, 7, TIMEOUT);
+	// Read the first portion of calibration data from memory address 0x88
 
+	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD1, MEMADDRESSSIZE, calibData1, CALIBDATASIZE1);
+
+	// Read the second portion of calibration data from memory address 0x88
+
+	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD2, MEMADDRESSSIZE, calibData2, CALIBDATASIZE2);
+
+	// Calculate the compensation words for later evaluations
 
 	dig_T1 = (calibData1[1] << 8) | calibData1[0];
 	dig_T2 = (calibData1[3] << 8) | calibData1[2];
@@ -66,64 +97,108 @@ uint8_t calibData2[7];
 
 }
 
+/* Initializes the BME280 sensor
+ *
+ * This function initializes the BME280 sensor
+ * Uses the recommended mode of operation suggested for indoor navigation - Datasheet page 20 -> 3.5.3
+ * 		- Refer to datasheet page 26 >> 5. Global memory map and register description
+ *
+ */
+
 void BME280_init(void) {
 
+	// Read and set the calibration parameters required for sensor compensation
 
 	trimmingParametersRead();
 
-
+	// Value required to reset the device
 	uint8_t resetSeq = 0xB6;
+
+	// Set the humidity data acquisition option (oversampling x 1)
 	uint8_t ctrlHum = 0x01;
-	uint8_t ctrlMeas = 0b10101011;
+
+	/* Set the pressure and temperature data acquisition options
+	 Bit 7, 6, 5 = temperature (oversampling x 16)
+	 Bit 4, 3, 2 = pressure (skipped)
+	 Bit 1, 0 = mode (normal mode)
+	 */
+	uint8_t ctrlMeas = 0b10100011;
+
+	/* Set the rate, filter and interface options on the device
+	 Bit 7, 6, 5 = controls inactive duration
+	 in normal mode (tstandby 0.5 ms)
+	 Bit 4, 3, 2 = IIR filter (filter coeficient 16)
+	 Bit 0 = Enables 3-wire SPI (skipped)
+	 */
 	uint8_t config = 0b00010000;
 
-	// Soft Reset
+	// Performs a soft reset of the device
 
-	HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, RESET_REG, 1, &resetSeq , 1, 1000);
+	i2c_Mem_Write(BME280_ADDRESS, RESET_REG, MEMADDRESSSIZE, &resetSeq, CMDWRITESIZE);
 
-	HAL_Delay(100);
+	HAL_Delay(BME_HAL_DELAY);
 
-	// ctrl_hum
+	// Configure control humidity register
 
-	HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, CTRL_HUM, 1, &ctrlHum , 1, 1000);
+	i2c_Mem_Write(BME280_ADDRESS, CTRL_HUM, MEMADDRESSSIZE, &ctrlHum, CMDWRITESIZE);
 
-	HAL_Delay(100);
+	HAL_Delay(BME_HAL_DELAY);
 
-	// ctrl_meas
+	// Configure temperature and operation mode of the sensor
 
-	HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, CTRL_MEAS, 1, &ctrlMeas , 1, 1000);
+	i2c_Mem_Write(BME280_ADDRESS, CTRL_MEAS, MEMADDRESSSIZE, &ctrlMeas, CMDWRITESIZE);
 
-	HAL_Delay(100);
+	HAL_Delay(BME_HAL_DELAY);
 
-	// config parameters
+	// Set the configuration registers
 
-	HAL_I2C_Mem_Write(&hi2c1, BME280_ADDRESS, CONFIG_REG, 1, &config , 1, 1000);
+	i2c_Mem_Write(BME280_ADDRESS, CONFIG_REG, MEMADDRESSSIZE, &config, CMDWRITESIZE);
 
-	HAL_Delay(100);
-
+	HAL_Delay(BME_HAL_DELAY);
 
 }
 
-void BME280_read(void) {
+/*
+ * Reads raw sensor data from the device
+ *
+ * This function reads the raw data from the sensor
+ * Used to calculate the actual values for temperature and humidity
+ * 		- Refer to datasheet page 30 >> 5.4.8 Register 0xFA...0xFC “temp” (_msb, _lsb, _xlsb)
+ * 									    5.4.9 Register 0xFD...0xFE “hum” (_msb, _lsb)
+ *
+ */
 
+
+static void BME280_read(void) {
+
+	// Array to store the raw sensor data
 	uint8_t sensorData[8];
 
 
-	HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0xF7, 1, sensorData, 8, 1000);
+	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData, RAWDATASIZE);
+
+	//HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0xF7, 1, sensorData, 8, 1000);
 
 	tADC = (sensorData[3] << 12) | (sensorData[4] << 4) | (sensorData[5] >> 4);
 	hADC = (sensorData[6] << 8) | sensorData[7];
 
-
 }
 
+
+
+/*
+ * Code provided to calculate the actual values using the trimming parameters
+ * and sensor read values for Temperature and Humidity
+ * 		- Refer to datasheet page 25 -> 4.2.3 Compensation formulas
+ *
+ */
 
 // Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 DegC.
 // t_fine carries fine temperature as global value
 
-BME280_S32_t t_fine;
+static BME280_S32_t t_fine;
 
-BME280_S32_t BME280_compensate_T_int32(BME280_S32_t adc_T) {
+static BME280_S32_t BME280_compensate_T_int32(BME280_S32_t adc_T) {
 	BME280_S32_t var1, var2, T;
 	var1 = ((((adc_T >> 3) - ((BME280_S32_t) dig_T1 << 1)))
 			* ((BME280_S32_t) dig_T2)) >> 11;
@@ -135,11 +210,10 @@ BME280_S32_t BME280_compensate_T_int32(BME280_S32_t adc_T) {
 	return T;
 }
 
-
 // Returns humidity in %RH as unsigned 32 bit integer in Q22.10 format (22 integer and 10 fractional bits).
 // Output value of “47445” represents 47445/1024 = 46.333 %RH
 
-BME280_U32_t bme280_compensate_H_int32(BME280_S32_t adc_H) {
+static BME280_U32_t bme280_compensate_H_int32(BME280_S32_t adc_H) {
 	BME280_S32_t v_x1_u32r;
 	v_x1_u32r = (t_fine - ((BME280_S32_t) 76800));
 	v_x1_u32r =
@@ -153,22 +227,25 @@ BME280_U32_t bme280_compensate_H_int32(BME280_S32_t adc_H) {
 							* ((BME280_S32_t) dig_H2) + 8192) >> 14));
 	v_x1_u32r = (v_x1_u32r
 			- (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7)
-							* ((BME280_S32_t) dig_H1)) >> 4));
+					* ((BME280_S32_t) dig_H1)) >> 4));
 	v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
 	v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
 	return (BME280_U32_t) (v_x1_u32r >> 12);
 }
 
+/*
+ * Reads the sensor and use the compensation formulas to calculate the
+ * actual temperature and humidity
+ *
+ */
 
 
-
-void BME280_calculate(void){
+void BME280_calculate(void) {
 
 	BME280_read();
 
 	temp = BME280_compensate_T_int32(tADC) / 100.0;
 	hum = bme280_compensate_H_int32(hADC) / 1024.0;
-
 
 }
 

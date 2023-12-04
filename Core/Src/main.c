@@ -27,8 +27,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include <driver_BME280.h>
+#include "driver_BME280.h"
 #include "API_controlFSM.h"
+#include "API_i2c.h"
 
 /* USER CODE END Includes */
 
@@ -105,8 +106,9 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
+  i2c_Init();		// initializes the I2C protocol
 
-  BME280_init();
+  BME280_init();	// Initializes the sensor with the initial parameters
   HAL_Delay(500);
 
 
