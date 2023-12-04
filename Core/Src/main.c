@@ -112,6 +112,7 @@ int main(void)
   i2c_Init();		// initializes the I2C protocol
 
   BME280_init();	// Initializes the sensor with the initial parameters
+  controlFSM_init();
   HAL_Delay(500);
 
 
@@ -132,8 +133,6 @@ int main(void)
 	  BME280_calculate();
       controlFSM_update();
 
-
-
 	  char dataStr[255] = "";
 
 	  sprintf(dataStr, "Temperature: %.2f Humidity: %.2f \r\n", temp, hum);
@@ -141,8 +140,8 @@ int main(void)
 	  //sprintf(dataStr, "Temperature: \r\n");
 
 
-      HAL_UART_Transmit(&huart2, (uint8_t *)dataStr, strlen(dataStr), 1000);
-
+     // HAL_UART_Transmit(&huart2, (uint8_t *)dataStr, strlen(dataStr), 1000);
+	  uartSendString((uint8_t *)dataStr);
 
       HAL_Delay(500);
 	//  HAL_UART_Transmit(&huart2, initialSettings, size, 1000);

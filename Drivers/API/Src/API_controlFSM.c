@@ -7,187 +7,232 @@
 
 #include <driver_BME280.h>
 #include "stm32f4xx_hal.h"
+#include "API_delay.h"
 #include "main.h"
 #include "API_controlFSM.h"
 
-// Private declarations
+/*
+ * Enumeration
+ * Define variables with the FMS states
+ *
+ */
+typedef enum {
+	TH_NORMAL,	// State for normal values for Temperature and Humidity
+	T_ALERT,	// State for temperature outside thresholds
+	H_ALERT,	// State for humidity outside thresholds
+	TH_ALERT,	// State for temperature and humidity outside thresholds
 
-typedef enum{
-NORMAL_TH,
-T_ALERT,
-H_ALERT,
-TH_ALERT,
+} controlFSM_state_t;
 
-} controlFSM_state_t ;		// Define a variable with the FMS states
+/*
+ * Delay used to control the blinking led when there's a temperature alert
+ */
+#define BME_HAL_TDELAY 100
 
+/*
+ * Delay used to control the blinking led when there's a humidity alert
+ */
+#define BME_HAL_HDELAY 500
+
+static const uint8_t DEBOUNCETIME = 40; // Debounce delay constant
+
+delay_t debounceDelay;		// Create a variable type delay_t
+tick_t initialDelay = DEBOUNCETIME;  // Set the initial time of the delay (40ms)
+
+// Variable to store the current state of the FSM
 static controlFSM_state_t controlFSM_state;
 
-
-void controlFSM_init(){			// Initialize the FMS
-
+// Initializes the control FSM
+void controlFSM_init() {
+	// Set the initial state to TH_NORMAL and turn off the led alert
+	controlFSM_state = TH_NORMAL;
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-
-
+	delayInit(&debounceDelay, initialDelay);	// Initialize the delay
 
 }
 
-void controlFSM_update(){
+/*
+ * Function to update the FSM based on the values of
+ * temperature temp and humidity hum read by the sensor
+ *
+ */
 
-	//uint8_t buttonState = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin); // Read the button state (pressed or released)
+void controlFSM_update() {
 
-	float minTemp = 20.0;
-	float maxTemp = 25.0;
+	// **** Define the temperature and humidity thresholds ****
+	const float minTemp = 20.0;
+	const float maxTemp = 30.0;
 
-	float minHum = 35.0;
-	float maxHum = 70.0;
+	const float minHum = 35.0;
+	const float maxHum = 70.0;
 
-/*	switch (controlFSM_state){
+	// ****
 
-	case NORMAL_TH:		// State when button is released
+	switch (controlFSM_state) {
 
-			ledOff();
+	case TH_NORMAL:	// State when temperature and humidity are within thresholds
 
-			if (temp < minTemp || temp > maxTemp) {
+		ledOff();	// Calls function to turn off the led
+
+		if (delayRead(&debounceDelay)) {
+
+			// If temperature and humidity are outside thresholds update state to TH_ALERT
+			if ((temp < minTemp || temp > maxTemp)
+					&& (hum < minHum || hum > maxHum)) {
+
+				controlFSM_state = TH_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+				// If temperature is outside thresholds update state to T_ALERT
+
+			} else if (temp < minTemp || temp > maxTemp) {
 
 				controlFSM_state = T_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+				// If humidity is outside thresholds update state to H_ALERT
+
+			} else if (hum < minHum || hum > maxHum) {
+
+				controlFSM_state = H_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
 
 			}
-
+		}
 		break;
 
-		case T_ALERT:
-
-			ledTalert();
-
-						if (temp >= minTemp && temp <= maxTemp) {
-
-							controlFSM_state = NORMAL_TH;
-
-						}
-
-					break;
-
-		default:
-
-			controlFSM_state = NORMAL_TH;
-
-			break;
-
-	}*/
-
-
-	switch (controlFSM_state){
-
-	case NORMAL_TH:		// State when button is released
-
-		ledOff();
-
-		if ((temp < minTemp || temp > maxTemp) && (hum < minHum || hum > maxHum)) {
-
-			controlFSM_state = TH_ALERT;
-
-		} else if (temp < minTemp || temp > maxTemp)  {
-
-			controlFSM_state = T_ALERT;
-
-		} else if (hum < minHum || hum > maxHum) {
-
-			controlFSM_state = H_ALERT;
-
-		}
-
-	break;
-
-	case T_ALERT:
+	case T_ALERT:// State when temperature is outside thresholds but humidity is ok
 
 		ledTalert();
 
-		if ((temp >= minTemp && temp <= maxTemp) && (hum >= minHum && hum <= maxHum)) {
+		if (delayRead(&debounceDelay)) {
 
-					controlFSM_state = NORMAL_TH;
+			// If temperature and humidity are within thresholds update state to TH_NORMAL
 
-				} else if ((temp >= minTemp && temp <= maxTemp) && (hum < minHum || hum > maxHum)) {
+			if ((temp >= minTemp && temp <= maxTemp)
+					&& (hum >= minHum && hum <= maxHum)) {
 
-					controlFSM_state = H_ALERT;
+				controlFSM_state = TH_NORMAL;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
 
-				} else if ((temp < minTemp || temp > maxTemp) && (hum < minHum || hum > maxHum)) {
+				// If humidity is outside thresholds update state to H_ALERT
 
-					controlFSM_state = TH_ALERT;
+			} else if ((temp >= minTemp && temp <= maxTemp)
+					&& (hum < minHum || hum > maxHum)) {
 
-				}
+				controlFSM_state = H_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
 
-	case H_ALERT:
+				// If temperature and humidity are outside thresholds update state to TH_ALERT
+			} else if ((temp < minTemp || temp > maxTemp)
+					&& (hum < minHum || hum > maxHum)) {
 
+				controlFSM_state = TH_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+			}
+		}
+
+	case H_ALERT:// State when humidity is outside thresholds but temperature is ok
 
 		ledHalert();
 
-		if ((temp >= minTemp && temp <= maxTemp) && (hum >= minHum && hum <= maxHum)) {
+		if (delayRead(&debounceDelay)) {
 
-					controlFSM_state = NORMAL_TH;
+			// If temperature and humidity are within thresholds update state to TH_NORMAL
 
-		} else if ((temp < minTemp || temp > maxTemp) && (hum >= minHum && hum <= maxHum)) {
+			if ((temp >= minTemp && temp <= maxTemp)
+					&& (hum >= minHum && hum <= maxHum)) {
 
-			controlFSM_state = T_ALERT;
+				controlFSM_state = TH_NORMAL;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
 
-		} else if ((temp < minTemp || temp > maxTemp) && (hum < minHum || hum > maxHum)) {
+				// If temperature is outside thresholds update state to T_ALERT
 
-			controlFSM_state = TH_ALERT;
+			} else if ((temp < minTemp || temp > maxTemp)
+					&& (hum >= minHum && hum <= maxHum)) {
 
+				controlFSM_state = T_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+				// If temperature and humidity are outside thresholds update state to TH_ALERT
+			} else if ((temp < minTemp || temp > maxTemp)
+					&& (hum < minHum || hum > maxHum)) {
+
+				controlFSM_state = TH_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+			}
 		}
-
 		break;
 
-	case TH_ALERT:	// State for the rising edge
-
+	case TH_ALERT:// State when temperature and humidity are outside thresholds
 
 		ledTHalert();
 
+		if (delayRead(&debounceDelay)) {
 
-		if ((temp >= minTemp && temp <= maxTemp) && (hum >= minHum && hum <= maxHum)) {
+			// If temperature and humidity are within thresholds update state to TH_NORMAL
 
-					controlFSM_state = NORMAL_TH;
+			if ((temp >= minTemp && temp <= maxTemp)
+					&& (hum >= minHum && hum <= maxHum)) {
 
-		} else if ((temp < minTemp && temp > maxTemp) && (hum >= minHum && hum <= maxHum)) {
+				controlFSM_state = TH_NORMAL;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
 
-			controlFSM_state = T_ALERT;
+				// If temperature is outside thresholds update state to T_ALERT
 
-		} else if ((temp >= minTemp && temp <= maxTemp) && (hum < minHum || hum > maxHum)) {
+			} else if ((temp < minTemp && temp > maxTemp)
+					&& (hum >= minHum && hum <= maxHum)) {
 
-			controlFSM_state = H_ALERT;
+				controlFSM_state = T_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+				// If humidity is outside thresholds update state to H_ALERT
+
+			} else if ((temp >= minTemp && temp <= maxTemp)
+					&& (hum < minHum || hum > maxHum)) {
+
+				controlFSM_state = H_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+			}
 
 		}
-
 		break;
 
 	default:
-
-		controlFSM_state = NORMAL_TH;
+		// default state for the FSM
+		controlFSM_state = TH_NORMAL;
 
 		break;
 
 	}
 }
 
-void ledOff(){
+// Function to turn off the led
+void ledOff() {
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 }
 
+// Function to blink the led when there's a temperature alert TDELAY = 100
 
-void ledTalert(){
+void ledTalert() {
 	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	HAL_Delay(250);
+	HAL_Delay(BME_HAL_TDELAY);
 
 }
 
+// Function to blink the led when there's a humidity alert
 
-void ledHalert(){
+void ledHalert() {
 	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	HAL_Delay(500);
+	HAL_Delay(BME_HAL_HDELAY);
 
 }
 
-
-void ledTHalert(){
+// Function to turn on the led
+void ledTHalert() {
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 
 }
