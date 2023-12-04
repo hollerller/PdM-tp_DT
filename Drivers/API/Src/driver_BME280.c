@@ -11,6 +11,7 @@
 #include "API_delay.h"
 #include "driver_BME280.h"
 #include "API_i2c.h"
+#include "API_uart.h"
 
 #define BME280_ADDRESS 0xEC	// Device Address
 #define TIMEOUT 1000		// Timeout
@@ -23,6 +24,7 @@
 #define CMDWRITESIZE 1		// Size of the control parameters
 #define RAWDATAREG1 0XF7	// First memory address of the first portion of raw data
 #define RAWDATASIZE 8		// Size of the raw data to be read
+#define CHIPIDREG 0xD0		// Memory address of the chip ID
 
 // Initial settings registers
 
@@ -170,20 +172,48 @@ void BME280_init(void) {
  */
 
 
-static void BME280_read(void) {
+/*static void BME280_read(void) {
 
 	// Array to store the raw sensor data
 	uint8_t sensorData[8];
+	uint8_t chipID;
+
+	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, &chipID, MEMADDRESSSIZE);
 
 
 	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData, RAWDATASIZE);
 
-	//HAL_I2C_Mem_Read(&hi2c1, BME280_ADDRESS, 0xF7, 1, sensorData, 8, 1000);
+	tADC = (sensorData[3] << 12) | (sensorData[4] << 4) | (sensorData[5] >> 4);
+	hADC = (sensorData[6] << 8) | sensorData[7];
+
+}*/
+
+static uint8_t BME280_read(void) {
+
+	// Array to store the raw sensor data
+	uint8_t sensorData[8];
+	// Variable to save the chipID read in the sensor
+	uint8_t chipID;
+
+
+	// Read the chip id
+	i2c_Mem_Read(BME280_ADDRESS, CHIPIDREG, MEMADDRESSSIZE, &chipID, MEMADDRESSSIZE);
+
+
+	if (chipID == 0x60){	// If the chip ID is 0x60, the device is read and perform the raw data reading
+
+	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData, RAWDATASIZE);
 
 	tADC = (sensorData[3] << 12) | (sensorData[4] << 4) | (sensorData[5] >> 4);
 	hADC = (sensorData[6] << 8) | sensorData[7];
 
+		return 0;
+	}
+
+	else return 1;
+
 }
+
 
 
 
@@ -240,7 +270,7 @@ static BME280_U32_t bme280_compensate_H_int32(BME280_S32_t adc_H) {
  *
  */
 
-
+/*
 void BME280_calculate(void) {
 
 	BME280_read();
@@ -248,5 +278,23 @@ void BME280_calculate(void) {
 	temp = BME280_compensate_T_int32(tADC) / 100.0;
 	hum = bme280_compensate_H_int32(hADC) / 1024.0;
 
-}
+}*/
 
+void BME280_calculate(void) {
+
+	if (BME280_read() == 0) {	// Calls BME280 function if return 0 (device was read)
+
+	temp = BME280_compensate_T_int32(tADC) / 100.0;
+	hum = bme280_compensate_H_int32(hADC) / 1024.0;
+
+	}
+
+	else {	// send error message when device is disconnected
+		temp = 0;
+		hum = 0;
+		uint8_t errorMessage[] = "Device not ready. Check device connection\r\n";
+
+				uartSendString(errorMessage);
+	}
+
+}

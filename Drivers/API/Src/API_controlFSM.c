@@ -223,7 +223,7 @@ void ledTalert() {
 
 }
 
-// Function to blink the led when there's a humidity alert
+// Function to blink the led when there's a humidity alert HDELAY = 500
 
 void ledHalert() {
 	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);

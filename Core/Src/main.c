@@ -52,10 +52,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-//I2C_HandleTypeDef hi2c1;
-
-UART_HandleTypeDef huart2;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -63,8 +59,6 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-//static void MX_USART2_UART_Init(void);
-//static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -87,7 +81,8 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -103,22 +98,15 @@ int main(void)
   /* Initialize all configured peripherals */
 
   MX_GPIO_Init();
-  // ------  ------   --- MX_USART2_UART_Init();
- // MX_I2C1_Init();
 
   /* USER CODE BEGIN 2 */
 
-  uartInit();
+  uartInit();		// Initializes the uart protocol
   i2c_Init();		// initializes the I2C protocol
 
   BME280_init();	// Initializes the sensor with the initial parameters
-  controlFSM_init();
+  controlFSM_init();// Initializes the FSM
   HAL_Delay(500);
-
-
- // uint8_t initialSettings[] = "UART Initialized at 115200 BaudRate, parity: NONE, Word Length 8 B\r\n";
-
- // uint8_t size = strlen((char * ) initialSettings);	// Get the size of the string
 
   /* USER CODE END 2 */
 
