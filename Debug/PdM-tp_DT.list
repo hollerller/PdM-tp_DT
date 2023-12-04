@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  12 .comment      00000043  00000000  00000000  00020204  2**0
                   CONTENTS, READONLY
- 13 .debug_info   0000b6eb  00000000  00000000  00020247  2**0
+ 13 .debug_info   0000b6dd  00000000  00000000  00020247  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00001e8d  00000000  00000000  0002b932  2**0
+ 14 .debug_abbrev 00001e8d  00000000  00000000  0002b924  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00000a80  00000000  00000000  0002d7c0  2**3
+ 15 .debug_aranges 00000a80  00000000  00000000  0002d7b8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 0000081e  00000000  00000000  0002e240  2**0
+ 16 .debug_rnglists 0000081e  00000000  00000000  0002e238  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  0001728b  00000000  00000000  0002ea5e  2**0
+ 17 .debug_macro  000170eb  00000000  00000000  0002ea56  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0000e8ef  00000000  00000000  00045ce9  2**0
+ 18 .debug_line   0000e624  00000000  00000000  00045b41  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    0008924e  00000000  00000000  000545d8  2**0
+ 19 .debug_str    0008924d  00000000  00000000  00054165  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  00003bd0  00000000  00000000  000dd828  2**2
+ 20 .debug_frame  00003bd0  00000000  00000000  000dd3b4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000061  00000000  00000000  000e13f8  2**0
+ 21 .debug_line_str 00000061  00000000  00000000  000e0f84  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1293,10 +1293,10 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
-  i2c_Init();
+  i2c_Init();		// initializes the I2C protocol
  8000f6a:	f000 fd97 	bl	8001a9c <i2c_Init>
 
-  BME280_init();
+  BME280_init();	// Initializes the sensor with the initial parameters
  8000f6e:	f000 ff09 	bl	8001d84 <BME280_init>
   HAL_Delay(500);
  8000f72:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
@@ -3130,20 +3130,22 @@ void ledTHalert(){
  8001a98:	40020000 	.word	0x40020000
 
 08001a9c <i2c_Init>:
+ * Define the clock speed, addressing mode and other configurations
+ *
+ */
 
-#define TIMEOUT 1000
-
-I2C_HandleTypeDef hi2c1;
 
 bool_t i2c_Init() {
  8001a9c:	b5b0      	push	{r4, r5, r7, lr}
  8001a9e:	b088      	sub	sp, #32
  8001aa0:	af00      	add	r7, sp, #0
 
-	bool_t i2cInitOk = false;// Variable to save the UART initialization status
+	bool_t i2cInitOk = false;// Variable to save the I2C initialization status
  8001aa2:	2300      	movs	r3, #0
  8001aa4:	77fb      	strb	r3, [r7, #31]
 
+
+	// Configure the I2C parameters
 	hi2c1.Instance = I2C1;
  8001aa6:	4b1b      	ldr	r3, [pc, #108]	; (8001b14 <i2c_Init+0x78>)
  8001aa8:	4a1b      	ldr	r2, [pc, #108]	; (8001b18 <i2c_Init+0x7c>)
@@ -3227,10 +3229,10 @@ bool_t i2c_Init() {
  8001b20:	08007404 	.word	0x08007404
 
 08001b24 <i2c_Mem_Write>:
-	  HAL_I2C_Master_Transmit(&hi2c1, devAddress, pData, size, TIMEOUT);
-
-}
-
+ * 	memAddSize: Size of the memory address
+ *  pData:		Pointer to data buffer to be written
+ *	size: 		Number of bytes to write
+ */
 
 void i2c_Mem_Write(uint16_t devAddress, uint16_t memAddress, uint16_t memAddSize, uint8_t *pData, uint16_t size){
  8001b24:	b580      	push	{r7, lr}
@@ -3267,6 +3269,10 @@ void i2c_Mem_Write(uint16_t devAddress, uint16_t memAddress, uint16_t memAddSize
  8001b5c:	2000023c 	.word	0x2000023c
 
 08001b60 <i2c_Mem_Read>:
+ * 	memAddSize: Size of the memory address
+ *  pData:		Pointer to data buffer to save data
+ *	size: 		Number of bytes to read
+ */
 
 void i2c_Mem_Read(uint16_t devAddress, uint16_t memAddress, uint16_t memAddSize, uint8_t *pData, uint16_t size){
  8001b60:	b580      	push	{r7, lr}

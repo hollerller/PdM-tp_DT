@@ -8,8 +8,8 @@
 #include <stdint.h>		// Include library for integer data type with specific width
 #include <stdbool.h>	// Include library for bool datatypes
 
-#ifndef API_INC_API_DELAY2_H_
-#define API_INC_API_DELAY2_H_
+#ifndef API_INC_API_DELAY_H_
+#define API_INC_API_DELAY_H_
 
 
 typedef uint32_t tick_t;	// Define unsigned integer data type
@@ -30,4 +30,4 @@ void delayWrite( delay_t *delay, tick_t duration );
 
 
 
-#endif /* API_INC_API_DELAY2_H_ */
+#endif /* API_INC_API_DELAY_H_ */
