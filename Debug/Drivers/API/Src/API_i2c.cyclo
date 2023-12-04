@@ -1,0 +1,4 @@
+../Drivers/API/Src/API_i2c.c:16:8:i2c_Init	2
+../Drivers/API/Src/API_i2c.c:47:6:i2c_Master_Trasmit	1
+../Drivers/API/Src/API_i2c.c:54:6:i2c_Mem_Write	1
+../Drivers/API/Src/API_i2c.c:61:6:i2c_Mem_Read	1

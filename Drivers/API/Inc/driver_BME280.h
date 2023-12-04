@@ -5,8 +5,8 @@
  *      Author: hollerller
  */
 
-#ifndef API_INC_BME280_H_
-#define API_INC_BME280_H_
+#ifndef API_INC_DRIVER_BME280_H_
+#define API_INC_DRIVER_BME280_H_
 
 extern float temp;  // Declaración externa de la variable temp
 extern float hum;   // Declaración externa de la variable hum
@@ -49,4 +49,4 @@ int BMEReadRaw(void);
 void BME280_Measure (void);
 */
 
-#endif /* API_INC_BME280_H_ */
+#endif /* API_INC_DRIVER_BME280_H_ */

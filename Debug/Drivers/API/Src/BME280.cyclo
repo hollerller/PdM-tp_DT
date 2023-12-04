@@ -1,6 +1,0 @@
-../Drivers/API/Src/BME280.c:38:6:trimmingParametersRead	1
-../Drivers/API/Src/BME280.c:69:6:BME280_init	1
-../Drivers/API/Src/BME280.c:107:6:BME280_read	1
-../Drivers/API/Src/BME280.c:126:14:BME280_compensate_T_int32	1
-../Drivers/API/Src/BME280.c:142:14:bme280_compensate_H_int32	1
-../Drivers/API/Src/BME280.c:165:6:BME280_calculate	1
