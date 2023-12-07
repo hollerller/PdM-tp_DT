@@ -37,13 +37,13 @@
 
 // Variables to save the compensation values for later calculations
 
-uint16_t dig_T1, dig_P1, dig_H1, dig_H3;
-int16_t dig_T2, dig_T3, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8,
+static uint16_t dig_T1, dig_P1, dig_H1, dig_H3;
+static int16_t dig_T2, dig_T3, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8,
 		dig_P9, dig_H2, dig_H4, dig_H5, dig_H6;
 
 // stores the raw data read by the sensor
 
-int32_t tADC, hADC;
+static int32_t tADC, hADC;
 
 typedef int32_t BME280_S32_t;
 typedef uint32_t BME280_U32_t;
