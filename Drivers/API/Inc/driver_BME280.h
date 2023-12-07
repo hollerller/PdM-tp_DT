@@ -30,5 +30,12 @@ void BME280_init(void);
  */
 void BME280_calculate(void);
 
+/*
+ * Uses uart API to send current values
+ *
+ */
+
+void BME280_uart();
+
 
 #endif /* API_INC_DRIVER_BME280_H_ */

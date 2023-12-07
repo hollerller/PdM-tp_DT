@@ -1,0 +1,6 @@
+../Drivers/API/Src/API_LCDhandler.c:35:6:LCDhandlerInit	1
+../Drivers/API/Src/API_LCDhandler.c:42:6:LCDhandlerFSM	8
+../Drivers/API/Src/API_LCDhandler.c:118:6:tempMax	2
+../Drivers/API/Src/API_LCDhandler.c:126:6:tempMin	2
+../Drivers/API/Src/API_LCDhandler.c:134:6:humMax	2
+../Drivers/API/Src/API_LCDhandler.c:142:6:humMin	2

@@ -1,0 +1,5 @@
+../Drivers/API/Src/driver_LCD.c:20:6:LCD_init	1
+../Drivers/API/Src/driver_LCD.c:45:6:LCD_sendCMD	1
+../Drivers/API/Src/driver_LCD.c:62:6:LCD_sendChar	1
+../Drivers/API/Src/driver_LCD.c:81:6:LCD_sendString	2
+../Drivers/API/Src/driver_LCD.c:92:6:LCD_clear	1

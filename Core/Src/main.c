@@ -27,11 +27,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+
 #include "API_delay.h"
 #include "API_i2c.h"
 #include "API_controlFSM.h"
 #include "driver_BME280.h"
 #include "API_uart.h"
+#include "driver_LCD.h"
+#include "API_LCDhandler.h"
 
 /* USER CODE END Includes */
 
@@ -101,12 +104,13 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
-  uartInit();		// Initializes the uart protocol
-  i2c_Init();		// initializes the I2C protocol
+	uartInit();		// Initializes the uart protocol
+	i2c_Init();		// initializes the I2C protocol
+	BME280_init();	// Initializes the sensor with the initial parameters
+	controlFSM_init();	// Initializes the FSM
+	LCD_init();		// Initializes the LCD
 
-  BME280_init();	// Initializes the sensor with the initial parameters
-  controlFSM_init();// Initializes the FSM
-  HAL_Delay(500);
+
 
   /* USER CODE END 2 */
 
@@ -118,21 +122,11 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  BME280_calculate();
-      controlFSM_update();
+		BME280_calculate();	// Calculate the temperature and humidity
+		BME280_uart();	// Send current temperature and humidity to UART
+		controlFSM_update();	// FSM to control alerts
+		LCDhandlerFSM();	// Control visualization in the LCD
 
-	  char dataStr[255] = "";
-
-	  sprintf(dataStr, "Temperature: %.2f Humidity: %.2f \r\n", temp, hum);
-
-	  //sprintf(dataStr, "Temperature: \r\n");
-
-
-     // HAL_UART_Transmit(&huart2, (uint8_t *)dataStr, strlen(dataStr), 1000);
-	  uartSendString((uint8_t *)dataStr);
-
-      HAL_Delay(500);
-	//  HAL_UART_Transmit(&huart2, initialSettings, size, 1000);
 
 
   }
