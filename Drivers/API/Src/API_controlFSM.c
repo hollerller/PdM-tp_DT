@@ -42,6 +42,10 @@ static tick_t initialDelay = DEBOUNCETIME;  // Set the initial time of the delay
 // Variable to store the current state of the FSM
 static controlFSM_state_t controlFSM_state;
 
+static float temp;
+static float hum;
+
+
 // Initializes the control FSM
 void controlFSM_init() {
 	// Set the initial state to TH_NORMAL and turn off the led alert
@@ -65,6 +69,9 @@ void controlFSM_update() {
 
 	const float minHum = 35.0;
 	const float maxHum = 65.0;
+
+	temp = BME280_getTemp();
+	hum = BME280_getHum();
 
 	// ****
 

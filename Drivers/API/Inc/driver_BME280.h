@@ -8,8 +8,8 @@
 #ifndef API_INC_DRIVER_BME280_H_
 #define API_INC_DRIVER_BME280_H_
 
-extern float temp;  // Used to read the temperature values outside this function
-extern float hum;   // Used to read the humidity values outside this function
+//extern float temp;  // Used to read the temperature values outside this function
+//extern float hum;   // Used to read the humidity values outside this function
 
 
 
@@ -36,6 +36,9 @@ void BME280_calculate(void);
  */
 
 void BME280_uart();
+
+float BME280_getTemp();
+float BME280_getHum();
 
 
 #endif /* API_INC_DRIVER_BME280_H_ */

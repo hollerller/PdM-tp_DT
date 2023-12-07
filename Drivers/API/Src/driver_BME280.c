@@ -271,15 +271,6 @@ static BME280_U32_t bme280_compensate_H_int32(BME280_S32_t adc_H) {
  *
  */
 
-/*
-void BME280_calculate(void) {
-
-	BME280_read();
-
-	temp = BME280_compensate_T_int32(tADC) / 100.0;
-	hum = bme280_compensate_H_int32(hADC) / 1024.0;
-
-}*/
 
 void BME280_calculate(void) {
 
@@ -299,6 +290,21 @@ void BME280_calculate(void) {
 	}
 
 }
+
+/*
+ * Function to get the temperature
+ *
+ */
+
+float BME280_getTemp(){
+	return temp;
+}
+
+float BME280_getHum(){
+	return hum;
+}
+
+
 /*
  * Uses uart API to send current values
  *

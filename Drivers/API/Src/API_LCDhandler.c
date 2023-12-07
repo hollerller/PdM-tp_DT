@@ -42,7 +42,10 @@ char messageTemp[16] = "";
 char messageHum[16] = "";
 
 
-//
+static float temp;
+static float hum;
+
+
 
 void LCDhandlerInit(){
 
@@ -54,6 +57,9 @@ void LCDhandlerInit(){
 void LCDhandlerFSM(){
 
 	// Calls the functions
+
+	temp = BME280_getTemp();
+	hum = BME280_getHum();
 
 	tempMax();
 	tempMin();
