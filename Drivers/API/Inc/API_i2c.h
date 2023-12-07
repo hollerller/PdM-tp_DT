@@ -17,11 +17,11 @@ bool_t i2c_Init(); 		// Initializes the I2C settings
 void i2c_Master_Trasmit(uint8_t * pData, uint8_t deviceAddress, uint16_t size);
 
 
-// Function to write an ammount of data to a specific memory address using I2C
+// Function to write an amount of data to a specific memory address using I2C
 void i2c_Mem_Write(uint16_t devAddress, uint16_t memAddress, uint16_t memAddSize, uint8_t *pData, uint16_t size);
 
 
-// Function to read an ammount of data to a specific memory address using I2C
+// Function to read an amount of data to a specific memory address using I2C
 void i2c_Mem_Read(uint16_t devAddress, uint16_t memAddress, uint16_t memAddSize, uint8_t *pData, uint16_t size);
 
 

@@ -37,7 +37,7 @@ typedef enum {
 static const uint8_t DEBOUNCETIME = 40; // Debounce delay constant
 
 static delay_t debounceDelay;		// Create a variable type delay_t
-static tick_t initialDelay = DEBOUNCETIME;  // Set the initial time of the delay (40ms)
+static tick_t initialDelay = DEBOUNCETIME; // Set the initial time of the delay (40ms)
 
 // Variable to store the current state of the FSM
 static controlFSM_state_t controlFSM_state;
@@ -45,6 +45,12 @@ static controlFSM_state_t controlFSM_state;
 static float temp;
 static float hum;
 
+// Functions to control the LED depending on the FSM states
+
+static void ledOff();
+static void ledTalert();
+static void ledTHalert();
+static void ledHalert();
 
 // Initializes the control FSM
 void controlFSM_init() {
@@ -70,10 +76,12 @@ void controlFSM_update() {
 	const float minHum = 35.0;
 	const float maxHum = 65.0;
 
+	// ****
+
+	// Get current values of temperature and humidity
+
 	temp = BME280_getTemp();
 	hum = BME280_getHum();
-
-	// ****
 
 	switch (controlFSM_state) {
 
@@ -190,21 +198,19 @@ void controlFSM_update() {
 
 				// If temperature is outside thresholds update state to T_ALERT
 
+			} else if (hum >= minHum && hum <= maxHum) {
+
+				controlFSM_state = T_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
+				// If humidity is outside thresholds update state to H_ALERT
+
+			} else if (temp >= minTemp && temp <= maxTemp) {
+
+				controlFSM_state = H_ALERT;
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+
 			}
-			else if (hum >= minHum && hum <= maxHum) {
-
-							controlFSM_state = T_ALERT;
-							delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
-
-							// If humidity is outside thresholds update state to H_ALERT
-
-						} else if (temp >= minTemp && temp <= maxTemp)
-								 {
-
-							controlFSM_state = H_ALERT;
-							delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
-
-						}
 
 		}
 		break;

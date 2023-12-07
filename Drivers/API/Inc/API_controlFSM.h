@@ -13,11 +13,4 @@
 void controlFSM_init();
 void controlFSM_update();
 
-// Functions to control the LED depending on the FSM states
-
-void ledOff();
-void ledTalert();
-void ledTHalert();
-void ledHalert();
-
 #endif /* API_INC_API_CONTROLFSM_H_ */

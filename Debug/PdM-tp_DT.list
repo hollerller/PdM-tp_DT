@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  12 .comment      00000043  00000000  00000000  00020214  2**0
                   CONTENTS, READONLY
- 13 .debug_info   0000bacb  00000000  00000000  00020257  2**0
+ 13 .debug_info   0000babc  00000000  00000000  00020257  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 0000223c  00000000  00000000  0002bd22  2**0
+ 14 .debug_abbrev 00002254  00000000  00000000  0002bd13  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00000b48  00000000  00000000  0002df60  2**3
+ 15 .debug_aranges 00000b48  00000000  00000000  0002df68  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 000008a5  00000000  00000000  0002eaa8  2**0
+ 16 .debug_rnglists 000008a5  00000000  00000000  0002eab0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  00017c58  00000000  00000000  0002f34d  2**0
+ 17 .debug_macro  00017c58  00000000  00000000  0002f355  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   000103df  00000000  00000000  00046fa5  2**0
+ 18 .debug_line   000103de  00000000  00000000  00046fad  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000894cc  00000000  00000000  00057384  2**0
+ 19 .debug_str    000894c7  00000000  00000000  0005738b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  00003e30  00000000  00000000  000e0850  2**2
+ 20 .debug_frame  00003e30  00000000  00000000  000e0854  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000061  00000000  00000000  000e4680  2**0
+ 21 .debug_line_str 00000061  00000000  00000000  000e4684  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2450,12 +2450,12 @@ Infinite_Loop:
 	...
 
 08001514 <LCDhandlerFSM>:
+
 	LCDstate = TH_CURRENT;
 
 }
 
-
-void LCDhandlerFSM(){
+void LCDhandlerFSM() {
  8001514:	b580      	push	{r7, lr}
  8001516:	b082      	sub	sp, #8
  8001518:	af00      	add	r7, sp, #0
@@ -2502,10 +2502,9 @@ void LCDhandlerFSM(){
  8001568:	d02c      	beq.n	80015c4 <LCDhandlerFSM+0xb0>
  800156a:	e083      	b.n	8001674 <LCDhandlerFSM+0x160>
 
-		case TH_CURRENT:	// State to send current measures to LCD
+	case TH_CURRENT:	// State to send current measures to LCD
 
-
-			if (buttonState){
+		if (buttonState) {
  800156c:	79fb      	ldrb	r3, [r7, #7]
  800156e:	2b00      	cmp	r3, #0
  8001570:	d024      	beq.n	80015bc <LCDhandlerFSM+0xa8>
@@ -2548,19 +2547,18 @@ void LCDhandlerFSM(){
 			LCDstate = TH_MAX;
 		}
 
-
-			break;
+		break;
  80015ba:	e05f      	b.n	800167c <LCDhandlerFSM+0x168>
 			LCDstate = TH_MAX;
  80015bc:	4b34      	ldr	r3, [pc, #208]	; (8001690 <LCDhandlerFSM+0x17c>)
  80015be:	2201      	movs	r2, #1
  80015c0:	701a      	strb	r2, [r3, #0]
-			break;
+		break;
  80015c2:	e05b      	b.n	800167c <LCDhandlerFSM+0x168>
 
-		case TH_MAX:// State to send maximum values
+	case TH_MAX:	// State to send maximum values
 
-			if (buttonState){
+		if (buttonState) {
  80015c4:	79fb      	ldrb	r3, [r7, #7]
  80015c6:	2b00      	cmp	r3, #0
  80015c8:	d024      	beq.n	8001614 <LCDhandlerFSM+0x100>
@@ -2600,26 +2598,26 @@ void LCDhandlerFSM(){
  800160c:	4824      	ldr	r0, [pc, #144]	; (80016a0 <LCDhandlerFSM+0x18c>)
  800160e:	f001 f808 	bl	8002622 <LCD_sendString>
 
-			} else {
-						LCDstate = TH_MIN;
-					}
+		} else {
+			LCDstate = TH_MIN;
+		}
 
-			break;
+		break;
  8001612:	e033      	b.n	800167c <LCDhandlerFSM+0x168>
-						LCDstate = TH_MIN;
+			LCDstate = TH_MIN;
  8001614:	4b1e      	ldr	r3, [pc, #120]	; (8001690 <LCDhandlerFSM+0x17c>)
  8001616:	2202      	movs	r2, #2
  8001618:	701a      	strb	r2, [r3, #0]
-			break;
+		break;
  800161a:	e02f      	b.n	800167c <LCDhandlerFSM+0x168>
 
-		case TH_MIN:// State to send minimum values
+	case TH_MIN:	// State to send minimum values
 
-			if (buttonState){
+		if (buttonState) {
  800161c:	79fb      	ldrb	r3, [r7, #7]
  800161e:	2b00      	cmp	r3, #0
  8001620:	d024      	beq.n	800166c <LCDhandlerFSM+0x158>
-				LCD_clear();
+			LCD_clear();
  8001622:	f001 f81f 	bl	8002664 <LCD_clear>
 			LCD_sendCMD(0x80);
  8001626:	2080      	movs	r0, #128	; 0x80
@@ -2655,31 +2653,30 @@ void LCDhandlerFSM(){
  8001664:	480e      	ldr	r0, [pc, #56]	; (80016a0 <LCDhandlerFSM+0x18c>)
  8001666:	f000 ffdc 	bl	8002622 <LCD_sendString>
 
-			} else {
-									LCDstate = TH_CURRENT;
-								}
+		} else {
+			LCDstate = TH_CURRENT;
+		}
 
-			break;
+		break;
  800166a:	e007      	b.n	800167c <LCDhandlerFSM+0x168>
-									LCDstate = TH_CURRENT;
+			LCDstate = TH_CURRENT;
  800166c:	4b08      	ldr	r3, [pc, #32]	; (8001690 <LCDhandlerFSM+0x17c>)
  800166e:	2200      	movs	r2, #0
  8001670:	701a      	strb	r2, [r3, #0]
-			break;
+		break;
  8001672:	e003      	b.n	800167c <LCDhandlerFSM+0x168>
 
-		default:
-			// default state for the FSM
-			LCDstate = TH_CURRENT;
+	default:
+		// default state for the FSM
+		LCDstate = TH_CURRENT;
  8001674:	4b06      	ldr	r3, [pc, #24]	; (8001690 <LCDhandlerFSM+0x17c>)
  8001676:	2200      	movs	r2, #0
  8001678:	701a      	strb	r2, [r3, #0]
 
-			break;
+		break;
  800167a:	bf00      	nop
 
-		}
-
+	}
 
 }
  800167c:	bf00      	nop
@@ -2704,16 +2701,16 @@ void LCDhandlerFSM(){
  80016c0:	08007db0 	.word	0x08007db0
 
 080016c4 <tempMax>:
+ * Functions to update the maximum and minimum values of temperature and humidity
  * read and calculated from the sensor
  *
  */
 
-
-void tempMax(){
+void tempMax() {
  80016c4:	b480      	push	{r7}
  80016c6:	af00      	add	r7, sp, #0
 
-	if (temp > maxTemp){
+	if (temp > maxTemp) {
  80016c8:	4b0a      	ldr	r3, [pc, #40]	; (80016f4 <tempMax+0x30>)
  80016ca:	ed93 7a00 	vldr	s14, [r3]
  80016ce:	4b0a      	ldr	r3, [pc, #40]	; (80016f8 <tempMax+0x34>)
@@ -2742,11 +2739,11 @@ void tempMax(){
 
 080016fc <tempMin>:
 
-void tempMin(){
+void tempMin() {
  80016fc:	b480      	push	{r7}
  80016fe:	af00      	add	r7, sp, #0
 
-	if (temp < minTemp){
+	if (temp < minTemp) {
  8001700:	4b0a      	ldr	r3, [pc, #40]	; (800172c <tempMin+0x30>)
  8001702:	ed93 7a00 	vldr	s14, [r3]
  8001706:	4b0a      	ldr	r3, [pc, #40]	; (8001730 <tempMin+0x34>)
@@ -2775,11 +2772,11 @@ void tempMin(){
 
 08001734 <humMax>:
 
-void humMax(){
+void humMax() {
  8001734:	b480      	push	{r7}
  8001736:	af00      	add	r7, sp, #0
 
-	if (hum > maxHum){
+	if (hum > maxHum) {
  8001738:	4b0a      	ldr	r3, [pc, #40]	; (8001764 <humMax+0x30>)
  800173a:	ed93 7a00 	vldr	s14, [r3]
  800173e:	4b0a      	ldr	r3, [pc, #40]	; (8001768 <humMax+0x34>)
@@ -2808,11 +2805,11 @@ void humMax(){
 
 0800176c <humMin>:
 
-void humMin(){
+void humMin() {
  800176c:	b480      	push	{r7}
  800176e:	af00      	add	r7, sp, #0
 
-	if (hum < minHum){
+	if (hum < minHum) {
  8001770:	4b0a      	ldr	r3, [pc, #40]	; (800179c <humMin+0x30>)
  8001772:	ed93 7a00 	vldr	s14, [r3]
  8001776:	4b0a      	ldr	r3, [pc, #40]	; (80017a0 <humMin+0x34>)
@@ -2840,9 +2837,9 @@ void humMin(){
  80017a0:	2000000c 	.word	0x2000000c
 
 080017a4 <controlFSM_init>:
-static float temp;
-static float hum;
-
+static void ledTalert();
+static void ledTHalert();
+static void ledHalert();
 
 // Initializes the control FSM
 void controlFSM_init() {
@@ -2899,6 +2896,10 @@ void controlFSM_update() {
  80017ea:	4ba1      	ldr	r3, [pc, #644]	; (8001a70 <controlFSM_update+0x298>)
  80017ec:	603b      	str	r3, [r7, #0]
 
+	// ****
+
+	// Get current values of temperature and humidity
+
 	temp = BME280_getTemp();
  80017ee:	f000 fe35 	bl	800245c <BME280_getTemp>
  80017f2:	eef0 7a40 	vmov.f32	s15, s0
@@ -2909,8 +2910,6 @@ void controlFSM_update() {
  8001800:	eef0 7a40 	vmov.f32	s15, s0
  8001804:	4b9c      	ldr	r3, [pc, #624]	; (8001a78 <controlFSM_update+0x2a0>)
  8001806:	edc3 7a00 	vstr	s15, [r3]
-
-	// ****
 
 	switch (controlFSM_state) {
  800180a:	4b9c      	ldr	r3, [pc, #624]	; (8001a7c <controlFSM_update+0x2a4>)
@@ -3394,8 +3393,7 @@ void controlFSM_update() {
 
 				// If temperature is outside thresholds update state to T_ALERT
 
-			}
-			else if (hum >= minHum && hum <= maxHum) {
+			} else if (hum >= minHum && hum <= maxHum) {
  8001c40:	4b28      	ldr	r3, [pc, #160]	; (8001ce4 <controlFSM_update+0x50c>)
  8001c42:	edd3 7a00 	vldr	s15, [r3]
  8001c46:	ed97 7a01 	vldr	s14, [r7, #4]
@@ -3409,11 +3407,11 @@ void controlFSM_update() {
  8001c62:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  8001c66:	db09      	blt.n	8001c7c <controlFSM_update+0x4a4>
 
-							controlFSM_state = T_ALERT;
+				controlFSM_state = T_ALERT;
  8001c68:	4b1f      	ldr	r3, [pc, #124]	; (8001ce8 <controlFSM_update+0x510>)
  8001c6a:	2201      	movs	r2, #1
  8001c6c:	701a      	strb	r2, [r3, #0]
-							delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
  8001c6e:	4b1f      	ldr	r3, [pc, #124]	; (8001cec <controlFSM_update+0x514>)
  8001c70:	681b      	ldr	r3, [r3, #0]
  8001c72:	4619      	mov	r1, r3
@@ -3421,23 +3419,23 @@ void controlFSM_update() {
  8001c76:	f000 f86f 	bl	8001d58 <delayInit>
  8001c7a:	e01f      	b.n	8001cbc <controlFSM_update+0x4e4>
 
-							// If humidity is outside thresholds update state to H_ALERT
+				// If humidity is outside thresholds update state to H_ALERT
 
-						} else if (temp >= minTemp && temp <= maxTemp)
+			} else if (temp >= minTemp && temp <= maxTemp) {
  8001c7c:	4b18      	ldr	r3, [pc, #96]	; (8001ce0 <controlFSM_update+0x508>)
  8001c7e:	edd3 7a00 	vldr	s15, [r3]
  8001c82:	ed97 7a03 	vldr	s14, [r7, #12]
  8001c86:	eeb4 7ae7 	vcmpe.f32	s14, s15
  8001c8a:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
  8001c8e:	d900      	bls.n	8001c92 <controlFSM_update+0x4ba>
-							delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
 
-						}
+			}
 
 		}
 		break;
  8001c90:	e01f      	b.n	8001cd2 <controlFSM_update+0x4fa>
-						} else if (temp >= minTemp && temp <= maxTemp)
+			} else if (temp >= minTemp && temp <= maxTemp) {
  8001c92:	4b13      	ldr	r3, [pc, #76]	; (8001ce0 <controlFSM_update+0x508>)
  8001c94:	edd3 7a00 	vldr	s15, [r3]
  8001c98:	ed97 7a02 	vldr	s14, [r7, #8]
@@ -3446,11 +3444,11 @@ void controlFSM_update() {
  8001ca4:	da00      	bge.n	8001ca8 <controlFSM_update+0x4d0>
 		break;
  8001ca6:	e014      	b.n	8001cd2 <controlFSM_update+0x4fa>
-							controlFSM_state = H_ALERT;
+				controlFSM_state = H_ALERT;
  8001ca8:	4b0f      	ldr	r3, [pc, #60]	; (8001ce8 <controlFSM_update+0x510>)
  8001caa:	2202      	movs	r2, #2
  8001cac:	701a      	strb	r2, [r3, #0]
-							delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
+				delayInit(&debounceDelay, initialDelay);// Initialize the delay for debounce
  8001cae:	4b0f      	ldr	r3, [pc, #60]	; (8001cec <controlFSM_update+0x514>)
  8001cb0:	681b      	ldr	r3, [r3, #0]
  8001cb2:	4619      	mov	r1, r3
@@ -3971,7 +3969,10 @@ bool_t uartInit(){
  8001f70:	08007de0 	.word	0x08007de0
 
 08001f74 <uartSendString>:
-
+/*
+ * Functions to transmit a full string over UART
+ *
+ */
 
 void uartSendString(uint8_t * pstring){
  8001f74:	b580      	push	{r7, lr}
@@ -4018,7 +4019,7 @@ static void trimmingParametersRead(void) {
 
 	// Read the first portion of calibration data from memory address 0x88
 
-	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD1, MEMADDRESSSIZE, calibData1, CALIBDATASIZE1);
+	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD1, MEMADDRESSSIZE, calibData1,
  8001faa:	f107 030c 	add.w	r3, r7, #12
  8001fae:	2219      	movs	r2, #25
  8001fb0:	9200      	str	r2, [sp, #0]
@@ -4026,10 +4027,11 @@ static void trimmingParametersRead(void) {
  8001fb4:	2188      	movs	r1, #136	; 0x88
  8001fb6:	20ec      	movs	r0, #236	; 0xec
  8001fb8:	f7ff ff7e 	bl	8001eb8 <i2c_Mem_Read>
+			CALIBDATASIZE1);
 
 	// Read the second portion of calibration data from memory address 0x88
 
-	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD2, MEMADDRESSSIZE, calibData2, CALIBDATASIZE2);
+	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD2, MEMADDRESSSIZE, calibData2,
  8001fbc:	1d3b      	adds	r3, r7, #4
  8001fbe:	2207      	movs	r2, #7
  8001fc0:	9200      	str	r2, [sp, #0]
@@ -4037,6 +4039,7 @@ static void trimmingParametersRead(void) {
  8001fc4:	21e1      	movs	r1, #225	; 0xe1
  8001fc6:	20ec      	movs	r0, #236	; 0xec
  8001fc8:	f7ff ff76 	bl	8001eb8 <i2c_Mem_Read>
+			CALIBDATASIZE2);
 
 	// Calculate the compensation words for later evaluations
 
@@ -4281,7 +4284,7 @@ void BME280_init(void) {
 
 	// Performs a soft reset of the device
 
-	i2c_Mem_Write(BME280_ADDRESS, RESET_REG, MEMADDRESSSIZE, &resetSeq, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, RESET_REG, MEMADDRESSSIZE, &resetSeq,
  8002176:	1dfb      	adds	r3, r7, #7
  8002178:	2201      	movs	r2, #1
  800217a:	9200      	str	r2, [sp, #0]
@@ -4289,6 +4292,7 @@ void BME280_init(void) {
  800217e:	21e0      	movs	r1, #224	; 0xe0
  8002180:	20ec      	movs	r0, #236	; 0xec
  8002182:	f7ff fe7b 	bl	8001e7c <i2c_Mem_Write>
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
  8002186:	2064      	movs	r0, #100	; 0x64
@@ -4296,7 +4300,7 @@ void BME280_init(void) {
 
 	// Configure control humidity register
 
-	i2c_Mem_Write(BME280_ADDRESS, CTRL_HUM, MEMADDRESSSIZE, &ctrlHum, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, CTRL_HUM, MEMADDRESSSIZE, &ctrlHum,
  800218c:	1dbb      	adds	r3, r7, #6
  800218e:	2201      	movs	r2, #1
  8002190:	9200      	str	r2, [sp, #0]
@@ -4304,6 +4308,7 @@ void BME280_init(void) {
  8002194:	21f2      	movs	r1, #242	; 0xf2
  8002196:	20ec      	movs	r0, #236	; 0xec
  8002198:	f7ff fe70 	bl	8001e7c <i2c_Mem_Write>
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
  800219c:	2064      	movs	r0, #100	; 0x64
@@ -4311,7 +4316,7 @@ void BME280_init(void) {
 
 	// Configure temperature and operation mode of the sensor
 
-	i2c_Mem_Write(BME280_ADDRESS, CTRL_MEAS, MEMADDRESSSIZE, &ctrlMeas, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, CTRL_MEAS, MEMADDRESSSIZE, &ctrlMeas,
  80021a2:	1d7b      	adds	r3, r7, #5
  80021a4:	2201      	movs	r2, #1
  80021a6:	9200      	str	r2, [sp, #0]
@@ -4319,6 +4324,7 @@ void BME280_init(void) {
  80021aa:	21f4      	movs	r1, #244	; 0xf4
  80021ac:	20ec      	movs	r0, #236	; 0xec
  80021ae:	f7ff fe65 	bl	8001e7c <i2c_Mem_Write>
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
  80021b2:	2064      	movs	r0, #100	; 0x64
@@ -4326,7 +4332,7 @@ void BME280_init(void) {
 
 	// Set the configuration registers
 
-	i2c_Mem_Write(BME280_ADDRESS, CONFIG_REG, MEMADDRESSSIZE, &config, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, CONFIG_REG, MEMADDRESSSIZE, &config,
  80021b8:	1d3b      	adds	r3, r7, #4
  80021ba:	2201      	movs	r2, #1
  80021bc:	9200      	str	r2, [sp, #0]
@@ -4334,6 +4340,7 @@ void BME280_init(void) {
  80021c0:	21f5      	movs	r1, #245	; 0xf5
  80021c2:	20ec      	movs	r0, #236	; 0xec
  80021c4:	f7ff fe5a 	bl	8001e7c <i2c_Mem_Write>
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
  80021c8:	2064      	movs	r0, #100	; 0x64
@@ -4347,21 +4354,21 @@ void BME280_init(void) {
 	...
 
 080021d8 <BME280_read>:
-	tADC = (sensorData[3] << 12) | (sensorData[4] << 4) | (sensorData[5] >> 4);
-	hADC = (sensorData[6] << 8) | sensorData[7];
+ * 									    5.4.9 Register 0xFD...0xFE “hum” (_msb, _lsb)
+ *
+ */
 
-}*/
 
 static uint8_t BME280_read(void) {
  80021d8:	b580      	push	{r7, lr}
  80021da:	b086      	sub	sp, #24
  80021dc:	af02      	add	r7, sp, #8
+	uint8_t sensorData[8];
 	// Variable to save the chipID read in the sensor
 	uint8_t chipID;
 
-
 	// Read the chip id
-	i2c_Mem_Read(BME280_ADDRESS, CHIPIDREG, MEMADDRESSSIZE, &chipID, MEMADDRESSSIZE);
+	i2c_Mem_Read(BME280_ADDRESS, CHIPIDREG, MEMADDRESSSIZE, &chipID,
  80021de:	1dfb      	adds	r3, r7, #7
  80021e0:	2201      	movs	r2, #1
  80021e2:	9200      	str	r2, [sp, #0]
@@ -4369,14 +4376,14 @@ static uint8_t BME280_read(void) {
  80021e6:	21d0      	movs	r1, #208	; 0xd0
  80021e8:	20ec      	movs	r0, #236	; 0xec
  80021ea:	f7ff fe65 	bl	8001eb8 <i2c_Mem_Read>
+			MEMADDRESSSIZE);
 
-
-	if (chipID == 0x60){	// If the chip ID is 0x60, the device is read and perform the raw data reading
+	if (chipID == 0x60) {// If the chip ID is 0x60, the device is read and perform the raw data reading
  80021ee:	79fb      	ldrb	r3, [r7, #7]
  80021f0:	2b60      	cmp	r3, #96	; 0x60
  80021f2:	d11b      	bne.n	800222c <BME280_read+0x54>
 
-	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData, RAWDATASIZE);
+		i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData,
  80021f4:	f107 0308 	add.w	r3, r7, #8
  80021f8:	2208      	movs	r2, #8
  80021fa:	9200      	str	r2, [sp, #0]
@@ -4384,20 +4391,23 @@ static uint8_t BME280_read(void) {
  80021fe:	21f7      	movs	r1, #247	; 0xf7
  8002200:	20ec      	movs	r0, #236	; 0xec
  8002202:	f7ff fe59 	bl	8001eb8 <i2c_Mem_Read>
+				RAWDATASIZE);
 
-	tADC = (sensorData[3] << 12) | (sensorData[4] << 4) | (sensorData[5] >> 4);
+		tADC = (sensorData[3] << 12) | (sensorData[4] << 4)
  8002206:	7afb      	ldrb	r3, [r7, #11]
  8002208:	031a      	lsls	r2, r3, #12
  800220a:	7b3b      	ldrb	r3, [r7, #12]
  800220c:	011b      	lsls	r3, r3, #4
  800220e:	4313      	orrs	r3, r2
+				| (sensorData[5] >> 4);
  8002210:	7b7a      	ldrb	r2, [r7, #13]
  8002212:	0912      	lsrs	r2, r2, #4
  8002214:	b2d2      	uxtb	r2, r2
  8002216:	4313      	orrs	r3, r2
+		tADC = (sensorData[3] << 12) | (sensorData[4] << 4)
  8002218:	4a07      	ldr	r2, [pc, #28]	; (8002238 <BME280_read+0x60>)
  800221a:	6013      	str	r3, [r2, #0]
-	hADC = (sensorData[6] << 8) | sensorData[7];
+		hADC = (sensorData[6] << 8) | sensorData[7];
  800221c:	7bbb      	ldrb	r3, [r7, #14]
  800221e:	021b      	lsls	r3, r3, #8
  8002220:	7bfa      	ldrb	r2, [r7, #15]
@@ -4410,7 +4420,8 @@ static uint8_t BME280_read(void) {
  800222a:	e000      	b.n	800222e <BME280_read+0x56>
 	}
 
-	else return 1;
+	else
+		return 1;
  800222c:	2301      	movs	r3, #1
 
 }
@@ -4423,9 +4434,9 @@ static uint8_t BME280_read(void) {
  800223c:	2000030c 	.word	0x2000030c
 
 08002240 <BME280_compensate_T_int32>:
+
 // Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 DegC.
 // t_fine carries fine temperature as global value
-
 static BME280_S32_t t_fine;
 
 static BME280_S32_t BME280_compensate_T_int32(BME280_S32_t adc_T) {
@@ -4608,23 +4619,23 @@ static BME280_U32_t bme280_compensate_H_int32(BME280_S32_t adc_H) {
  8002398:	200002e8 	.word	0x200002e8
 
 0800239c <BME280_calculate>:
+ * Reads the sensor and use the compensation formulas to calculate the
  * actual temperature and humidity
  *
  */
-
 
 void BME280_calculate(void) {
  800239c:	b5b0      	push	{r4, r5, r7, lr}
  800239e:	b08c      	sub	sp, #48	; 0x30
  80023a0:	af00      	add	r7, sp, #0
 
-	if (BME280_read() == 0) {	// Calls BME280 function if return 0 (device was read)
+	if (BME280_read() == 0) {// Calls BME280 function if return 0 (device was read)
  80023a2:	f7ff ff19 	bl	80021d8 <BME280_read>
  80023a6:	4603      	mov	r3, r0
  80023a8:	2b00      	cmp	r3, #0
  80023aa:	d12e      	bne.n	800240a <BME280_calculate+0x6e>
 
-	temp = BME280_compensate_T_int32(tADC) / 100.0;
+		temp = BME280_compensate_T_int32(tADC) / 100.0;
  80023ac:	4b24      	ldr	r3, [pc, #144]	; (8002440 <BME280_calculate+0xa4>)
  80023ae:	681b      	ldr	r3, [r3, #0]
  80023b0:	4618      	mov	r0, r3
@@ -4643,7 +4654,7 @@ void BME280_calculate(void) {
  80023d4:	4603      	mov	r3, r0
  80023d6:	4a1c      	ldr	r2, [pc, #112]	; (8002448 <BME280_calculate+0xac>)
  80023d8:	6013      	str	r3, [r2, #0]
-	hum = bme280_compensate_H_int32(hADC) / 1024.0;
+		hum = bme280_compensate_H_int32(hADC) / 1024.0;
  80023da:	4b1c      	ldr	r3, [pc, #112]	; (800244c <BME280_calculate+0xb0>)
  80023dc:	681b      	ldr	r3, [r3, #0]
  80023de:	4618      	mov	r0, r3
@@ -4664,7 +4675,7 @@ void BME280_calculate(void) {
  8002406:	6013      	str	r3, [r2, #0]
 		uint8_t errorMessage[] = "Device not ready. Check device connection\r\n";
 
-				uartSendString(errorMessage);
+		uartSendString(errorMessage);
 	}
 
 }
@@ -4687,7 +4698,7 @@ void BME280_calculate(void) {
  8002426:	c40f      	stmia	r4!, {r0, r1, r2, r3}
  8002428:	e895 0007 	ldmia.w	r5, {r0, r1, r2}
  800242c:	e884 0007 	stmia.w	r4, {r0, r1, r2}
-				uartSendString(errorMessage);
+		uartSendString(errorMessage);
  8002430:	1d3b      	adds	r3, r7, #4
  8002432:	4618      	mov	r0, r3
  8002434:	f7ff fd9e 	bl	8001f74 <uartSendString>
@@ -4706,11 +4717,11 @@ void BME280_calculate(void) {
 
 0800245c <BME280_getTemp>:
 /*
- * Function to get the temperature
+ * Function to get the current temperature
  *
  */
 
-float BME280_getTemp(){
+float BME280_getTemp() {
  800245c:	b480      	push	{r7}
  800245e:	af00      	add	r7, sp, #0
 	return temp;
@@ -4725,8 +4736,12 @@ float BME280_getTemp(){
  8002474:	20000310 	.word	0x20000310
 
 08002478 <BME280_getHum>:
+/*
+ * Function to get the current humidity
+ *
+ */
 
-float BME280_getHum(){
+float BME280_getHum() {
  8002478:	b480      	push	{r7}
  800247a:	af00      	add	r7, sp, #0
 	return hum;
@@ -4746,7 +4761,7 @@ float BME280_getHum(){
  *
  */
 
-void BME280_uart(){
+void BME280_uart() {
  8002494:	b5b0      	push	{r4, r5, r7, lr}
  8002496:	b0c2      	sub	sp, #264	; 0x108
  8002498:	af02      	add	r7, sp, #8
@@ -4800,14 +4815,16 @@ void BME280_uart(){
  8002500:	08007e54 	.word	0x08007e54
 
 08002504 <LCD_init>:
-
-#define INITIALDELAY 20
-
+ * Also configure the initial settings, function set, entry mode and enabling the display
+ *
+ */
 
 
 void LCD_init(){
  8002504:	b580      	push	{r7, lr}
  8002506:	af00      	add	r7, sp, #0
+
+	// Initial instructions
 
 	HAL_Delay(20);
  8002508:	2014      	movs	r0, #20
@@ -4864,6 +4881,9 @@ void LCD_init(){
  8002564:	bd80      	pop	{r7, pc}
 
 08002566 <LCD_sendCMD>:
+ * Send command in 4 bit mode using i2c transmit function
+ *
+ */
 
 
 void LCD_sendCMD(char command){
@@ -4928,6 +4948,10 @@ void LCD_sendCMD(char command){
  80025c2:	bd80      	pop	{r7, pc}
 
 080025c4 <LCD_sendChar>:
+ * Function used to send a character to the LCD
+ * Send character in 4 bit mode using i2c transmit function
+ *
+ */
 
 void LCD_sendChar(char caracter){
  80025c4:	b580      	push	{r7, lr}
@@ -4992,6 +5016,9 @@ void LCD_sendChar(char caracter){
  8002620:	bd80      	pop	{r7, pc}
 
 08002622 <LCD_sendString>:
+ * uses the send character function to print each char
+ *
+ */
 
 
 void LCD_sendString(char * text){
@@ -5038,6 +5065,10 @@ void LCD_sendString(char * text){
  8002662:	bd80      	pop	{r7, pc}
 
 08002664 <LCD_clear>:
+ * Function used to clear the display
+ * Uses command 0x01 to clear the display
+ *
+ */
 
 void LCD_clear(){
  8002664:	b580      	push	{r7, lr}

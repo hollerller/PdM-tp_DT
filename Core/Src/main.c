@@ -127,8 +127,6 @@ int main(void)
 		controlFSM_update();	// FSM to control alerts
 		LCDhandlerFSM();	// Control visualization in the LCD
 
-
-
   }
   /* USER CODE END 3 */
 }

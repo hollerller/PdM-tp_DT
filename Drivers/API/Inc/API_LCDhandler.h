@@ -13,9 +13,5 @@
 void LCDhandlerInit();
 void LCDhandlerFSM();
 
-void tempMax();
-void tempMin();
-void humMax();
-void humMin();
 
 #endif /* API_INC_API_LCDHANDLER_H_ */

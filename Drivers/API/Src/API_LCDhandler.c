@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include "main.h"
 
-
 /*
  * Enumeration
  * Define variables with the LCD states
@@ -41,20 +40,23 @@ static float minHum = 100;
 char messageTemp[16] = "";
 char messageHum[16] = "";
 
-
 static float temp;
 static float hum;
 
+// Internal functions to store the minimum and maximum values
 
+static void tempMax();
+static void tempMin();
+static void humMax();
+static void humMin();
 
-void LCDhandlerInit(){
+void LCDhandlerInit() {
 
 	LCDstate = TH_CURRENT;
 
 }
 
-
-void LCDhandlerFSM(){
+void LCDhandlerFSM() {
 
 	// Calls the functions
 
@@ -70,10 +72,9 @@ void LCDhandlerFSM(){
 
 	switch (LCDstate) {
 
-		case TH_CURRENT:	// State to send current measures to LCD
+	case TH_CURRENT:	// State to send current measures to LCD
 
-
-			if (buttonState){
+		if (buttonState) {
 			LCD_clear();
 			LCD_sendCMD(0x80);
 			sprintf(messageTemp, "Temp: %.2f", temp);
@@ -86,12 +87,11 @@ void LCDhandlerFSM(){
 			LCDstate = TH_MAX;
 		}
 
+		break;
 
-			break;
+	case TH_MAX:	// State to send maximum values
 
-		case TH_MAX:// State to send maximum values
-
-			if (buttonState){
+		if (buttonState) {
 			LCD_clear();
 			LCD_sendCMD(0x80);
 			sprintf(messageTemp, "Max Temp: %.2f", maxTemp);
@@ -101,16 +101,16 @@ void LCDhandlerFSM(){
 			sprintf(messageHum, "Max Hum:  %.2f", maxHum);
 			LCD_sendString(messageHum);
 
-			} else {
-						LCDstate = TH_MIN;
-					}
+		} else {
+			LCDstate = TH_MIN;
+		}
 
-			break;
+		break;
 
-		case TH_MIN:// State to send minimum values
+	case TH_MIN:	// State to send minimum values
 
-			if (buttonState){
-				LCD_clear();
+		if (buttonState) {
+			LCD_clear();
 			LCD_sendCMD(0x80);
 			sprintf(messageTemp, "Min Temp: %.2f", minTemp);
 			LCD_sendString(messageTemp);
@@ -119,23 +119,21 @@ void LCDhandlerFSM(){
 			sprintf(messageHum, "Min Hum:  %.2f", minHum);
 			LCD_sendString(messageHum);
 
-			} else {
-									LCDstate = TH_CURRENT;
-								}
-
-			break;
-
-		default:
-			// default state for the FSM
+		} else {
 			LCDstate = TH_CURRENT;
-
-			break;
-
 		}
 
+		break;
+
+	default:
+		// default state for the FSM
+		LCDstate = TH_CURRENT;
+
+		break;
+
+	}
 
 }
-
 
 /*
  * Functions to update the maximum and minimum values of temperature and humidity
@@ -143,34 +141,33 @@ void LCDhandlerFSM(){
  *
  */
 
+void tempMax() {
 
-void tempMax(){
-
-	if (temp > maxTemp){
+	if (temp > maxTemp) {
 		maxTemp = temp;
 	}
 
 }
 
-void tempMin(){
+void tempMin() {
 
-	if (temp < minTemp){
+	if (temp < minTemp) {
 		minTemp = temp;
 	}
 
 }
 
-void humMax(){
+void humMax() {
 
-	if (hum > maxHum){
+	if (hum > maxHum) {
 		maxHum = hum;
 	}
 
 }
 
-void humMin(){
+void humMin() {
 
-	if (hum < minHum){
+	if (hum < minHum) {
 		minHum = hum;
 	}
 

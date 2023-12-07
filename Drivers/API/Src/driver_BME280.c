@@ -35,7 +35,6 @@
 #define CTRL_MEAS 0xF4
 #define CONFIG_REG 0xF5
 
-
 // Variables to save the compensation values for later calculations
 
 uint16_t dig_T1, dig_P1, dig_H1, dig_H3;
@@ -51,7 +50,7 @@ typedef uint32_t BME280_U32_t;
 
 // stores the actual values for temperature and humidity
 
-float temp, hum, pres;
+static float temp, hum;
 
 /*
  * Reads the calibration data from the sensor
@@ -72,11 +71,13 @@ static void trimmingParametersRead(void) {
 
 	// Read the first portion of calibration data from memory address 0x88
 
-	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD1, MEMADDRESSSIZE, calibData1, CALIBDATASIZE1);
+	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD1, MEMADDRESSSIZE, calibData1,
+			CALIBDATASIZE1);
 
 	// Read the second portion of calibration data from memory address 0x88
 
-	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD2, MEMADDRESSSIZE, calibData2, CALIBDATASIZE2);
+	i2c_Mem_Read(BME280_ADDRESS, CALIBMEMADD2, MEMADDRESSSIZE, calibData2,
+			CALIBDATASIZE2);
 
 	// Calculate the compensation words for later evaluations
 
@@ -138,25 +139,29 @@ void BME280_init(void) {
 
 	// Performs a soft reset of the device
 
-	i2c_Mem_Write(BME280_ADDRESS, RESET_REG, MEMADDRESSSIZE, &resetSeq, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, RESET_REG, MEMADDRESSSIZE, &resetSeq,
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
 
 	// Configure control humidity register
 
-	i2c_Mem_Write(BME280_ADDRESS, CTRL_HUM, MEMADDRESSSIZE, &ctrlHum, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, CTRL_HUM, MEMADDRESSSIZE, &ctrlHum,
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
 
 	// Configure temperature and operation mode of the sensor
 
-	i2c_Mem_Write(BME280_ADDRESS, CTRL_MEAS, MEMADDRESSSIZE, &ctrlMeas, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, CTRL_MEAS, MEMADDRESSSIZE, &ctrlMeas,
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
 
 	// Set the configuration registers
 
-	i2c_Mem_Write(BME280_ADDRESS, CONFIG_REG, MEMADDRESSSIZE, &config, CMDWRITESIZE);
+	i2c_Mem_Write(BME280_ADDRESS, CONFIG_REG, MEMADDRESSSIZE, &config,
+			CMDWRITESIZE);
 
 	HAL_Delay(BME_HAL_DELAY);
 
@@ -173,22 +178,6 @@ void BME280_init(void) {
  */
 
 
-/*static void BME280_read(void) {
-
-	// Array to store the raw sensor data
-	uint8_t sensorData[8];
-	uint8_t chipID;
-
-	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, &chipID, MEMADDRESSSIZE);
-
-
-	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData, RAWDATASIZE);
-
-	tADC = (sensorData[3] << 12) | (sensorData[4] << 4) | (sensorData[5] >> 4);
-	hADC = (sensorData[6] << 8) | sensorData[7];
-
-}*/
-
 static uint8_t BME280_read(void) {
 
 	// Array to store the raw sensor data
@@ -196,27 +185,26 @@ static uint8_t BME280_read(void) {
 	// Variable to save the chipID read in the sensor
 	uint8_t chipID;
 
-
 	// Read the chip id
-	i2c_Mem_Read(BME280_ADDRESS, CHIPIDREG, MEMADDRESSSIZE, &chipID, MEMADDRESSSIZE);
+	i2c_Mem_Read(BME280_ADDRESS, CHIPIDREG, MEMADDRESSSIZE, &chipID,
+			MEMADDRESSSIZE);
 
+	if (chipID == 0x60) {// If the chip ID is 0x60, the device is read and perform the raw data reading
 
-	if (chipID == 0x60){	// If the chip ID is 0x60, the device is read and perform the raw data reading
+		i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData,
+				RAWDATASIZE);
 
-	i2c_Mem_Read(BME280_ADDRESS, RAWDATAREG1, MEMADDRESSSIZE, sensorData, RAWDATASIZE);
-
-	tADC = (sensorData[3] << 12) | (sensorData[4] << 4) | (sensorData[5] >> 4);
-	hADC = (sensorData[6] << 8) | sensorData[7];
+		tADC = (sensorData[3] << 12) | (sensorData[4] << 4)
+				| (sensorData[5] >> 4);
+		hADC = (sensorData[6] << 8) | sensorData[7];
 
 		return 0;
 	}
 
-	else return 1;
+	else
+		return 1;
 
 }
-
-
-
 
 /*
  * Code provided to calculate the actual values using the trimming parameters
@@ -227,7 +215,6 @@ static uint8_t BME280_read(void) {
 
 // Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 DegC.
 // t_fine carries fine temperature as global value
-
 static BME280_S32_t t_fine;
 
 static BME280_S32_t BME280_compensate_T_int32(BME280_S32_t adc_T) {
@@ -271,13 +258,12 @@ static BME280_U32_t bme280_compensate_H_int32(BME280_S32_t adc_H) {
  *
  */
 
-
 void BME280_calculate(void) {
 
-	if (BME280_read() == 0) {	// Calls BME280 function if return 0 (device was read)
+	if (BME280_read() == 0) {// Calls BME280 function if return 0 (device was read)
 
-	temp = BME280_compensate_T_int32(tADC) / 100.0;
-	hum = bme280_compensate_H_int32(hADC) / 1024.0;
+		temp = BME280_compensate_T_int32(tADC) / 100.0;
+		hum = bme280_compensate_H_int32(hADC) / 1024.0;
 
 	}
 
@@ -286,31 +272,35 @@ void BME280_calculate(void) {
 		hum = 0;
 		uint8_t errorMessage[] = "Device not ready. Check device connection\r\n";
 
-				uartSendString(errorMessage);
+		uartSendString(errorMessage);
 	}
 
 }
 
 /*
- * Function to get the temperature
+ * Function to get the current temperature
  *
  */
 
-float BME280_getTemp(){
+float BME280_getTemp() {
 	return temp;
 }
 
-float BME280_getHum(){
+/*
+ * Function to get the current humidity
+ *
+ */
+
+float BME280_getHum() {
 	return hum;
 }
-
 
 /*
  * Uses uart API to send current values
  *
  */
 
-void BME280_uart(){
+void BME280_uart() {
 
 	char dataStr[255] = "";
 

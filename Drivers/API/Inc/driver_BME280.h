@@ -8,10 +8,6 @@
 #ifndef API_INC_DRIVER_BME280_H_
 #define API_INC_DRIVER_BME280_H_
 
-//extern float temp;  // Used to read the temperature values outside this function
-//extern float hum;   // Used to read the humidity values outside this function
-
-
 
 /* Initializes the BME280 sensor
  *
@@ -30,15 +26,18 @@ void BME280_init(void);
  */
 void BME280_calculate(void);
 
-/*
- * Uses uart API to send current values
- *
- */
 
-void BME280_uart();
+/*
+ * Functions created to encapsulate values of temperature and humidity
+ */
 
 float BME280_getTemp();
 float BME280_getHum();
+
+
+// Function declaration to send current values over UART
+
+void BME280_uart();
 
 
 #endif /* API_INC_DRIVER_BME280_H_ */

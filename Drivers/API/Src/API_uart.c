@@ -48,6 +48,10 @@ bool_t uartInit(){
 
 }
 
+/*
+ * Functions to transmit a full string over UART
+ *
+ */
 
 void uartSendString(uint8_t * pstring){
 
@@ -59,7 +63,9 @@ void uartSendString(uint8_t * pstring){
 
 }
 
-
+/*
+ * Functions to transmit a part of a string over UART
+ */
 
 void uartSendStringSize(uint8_t * pstring, uint16_t size){
 
@@ -68,6 +74,10 @@ void uartSendStringSize(uint8_t * pstring, uint16_t size){
 
 }
 
+/*
+ * Functions to receive a string over UART
+ *
+ */
 
 void uartReceiveStringSize(uint8_t *pstring, uint16_t size) {
 
